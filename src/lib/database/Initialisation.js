@@ -68,11 +68,11 @@ export default class Initialisation {
    *
    * @param {SQLite.Transaction} transaction
    */
-  exampleUpdateVersion0(transaction) {
-    console.log('[db] Running pre-version 1 updates');
+  // exampleUpdateVersion0(transaction) {
+  //   console.log('[db] Running pre-version 1 updates');
 
-    transaction.executeSql('ALTER TABLE ...');
+  //   transaction.executeSql('ALTER TABLE ...');
 
-    transaction.executeSql('INSERT INTO version (version) values (1)');
-  }
+  //   transaction.executeSql('INSERT INTO version (version) values (1)');
+  // }
 }

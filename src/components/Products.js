@@ -31,7 +31,7 @@ class Products extends Component {
   async componentDidMount() {
     const db = await database.getDatabase();
     const model = new ProductsModel(db);
-    const products = await model.getAll();
+    const products = await model.get();
 
     this.setState({ products });
 

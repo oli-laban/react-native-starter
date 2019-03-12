@@ -24,14 +24,8 @@ export default class Version extends Model {
    * @returns {Promise<number>}
    */
   async getLatest() {
-    const [results] = await this.database.executeSql(
-      `SELECT version FROM ${this.table} ORDER BY version DESC LIMIT 1;`,
-    );
+    const row = this.getOne(null, { orderBy: 'version', order: 'DESC' });
 
-    if (results.rows && results.rows.length > 0) {
-      return results.rows.item(0).version;
-    }
-
-    return 0;
+    return row ? row.version : 0;
   }
 }
