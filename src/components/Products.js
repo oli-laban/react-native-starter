@@ -49,7 +49,13 @@ class Products extends Component {
   render() {
     const { products } = this.state;
 
-    return products.map(product => <Text key={product.product_id}>{product.name}</Text>);
+    return products.map(product => (
+      <Text key={product.id}>
+        {product.id}
+        {product.name}
+        {product.product_id}
+      </Text>
+    ));
   }
 }
 

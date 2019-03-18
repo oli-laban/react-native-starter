@@ -24,7 +24,7 @@ export default class Version extends Model {
    * @returns {Promise<number>}
    */
   async getLatest() {
-    const row = this.getOne(null, { orderBy: 'version', order: 'DESC' });
+    const row = await this.getOne(null, { orderBy: 'version', order: 'DESC' });
 
     return row ? row.version : 0;
   }

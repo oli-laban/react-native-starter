@@ -47,6 +47,18 @@ export default class Model {
   }
 
   /**
+   * Check that a column exists within the table's schema.
+   *
+   * @param {string} columnName - The name of the column to look for.
+   * @return {boolean} Whether the column exists.
+   */
+  columnExists(columnName) {
+    const schema = this.getSchema();
+
+    return !!schema.find(column => column.name === columnName);
+  }
+
+  /**
    * Create the database table for the model. A transaction must be passed as this should only
    * be called on initialisation of the database.
    *
@@ -138,7 +150,7 @@ export default class Model {
         })
         .join(' ');
     } else {
-      clause = 'id = ?';
+      clause = ' WHERE id = ?';
       clauseValues = [idOrWhere];
     }
 
@@ -171,21 +183,30 @@ export default class Model {
     const suffixValues = [];
 
     if (options.groupBy) {
+      // Using ? for GROUP BY in a prepared statement doesn't work in SQLite, so we'll need
+      // to validate the column(s) and include directly in the query string.
       if (Array.isArray(options.groupBy)) {
-        suffix += ` GROUP BY ${options.groupBy.map(() => '?').join(', ')}`;
-        suffixValues.concat(options.groupBy);
-      } else {
-        suffix += ' GROUP BY ?';
-        suffixValues.push(options.groupBy);
+        const groupByColumns = options.groupBy
+          .filter(column => this.columnExists(column))
+          .join(', ');
+
+        suffix += ` GROUP BY ${groupByColumns}`;
+      } else if (this.columnExists(options.groupBy)) {
+        suffix += ` GROUP BY ${options.groupBy}`;
       }
     }
 
     if (options.orderBy) {
-      const order = options.order ? options.order.toUpperCase() : 'ASC';
+      let order = 'DESC';
 
-      suffix += ' ORDER BY ? ?';
-      suffixValues.push(options.orderBy);
-      suffixValues.push(order);
+      if (options.order) {
+        order = options.order.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
+      }
+
+      // As with GROUP BY, Using ? for ORDER BY in a prepared statement doesn't work in SQLite.
+      if (this.columnExists(options.orderBy)) {
+        suffix += ` ORDER BY ${options.orderBy} ${order}`;
+      }
     }
 
     if (options.limit) {

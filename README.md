@@ -87,6 +87,8 @@ const products = await model.getAll();
 2. Remove `src/store/modules/database/` and the reducer from `src/store/index.js`
 3. Remove any references to the database from `App.js` including the `AppState` listener and associated method
 4. Remove the `databaseConfig` from `src/config/index.js`
+5. Run `react-native unlink react-native-sqlite-storage`
+6. Run `npm uninstall react-native-sqlite-storage` or `yarn remove react-native-sqlite-storage`
 
 ## Extras
 
