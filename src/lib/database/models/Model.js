@@ -123,7 +123,7 @@ export default class Model {
    * @param {number|Object<string, any|whereClause>} idOrWhere - ID of the row or a where object.
    * @returns {transformedClause} An object containing the WHERE clause string and values.
    */
-  transformIdOrWhere(idOrWhere) {
+  transformIdOrWhere(idOrWhere = null) {
     let clause = '';
     let clauseValues = [];
 
@@ -149,7 +149,7 @@ export default class Model {
           return `${prefix} ${column} = ?`;
         })
         .join(' ');
-    } else {
+    } else if (idOrWhere) {
       clause = ' WHERE id = ?';
       clauseValues = [idOrWhere];
     }

@@ -70,7 +70,7 @@ schema = [
 
 Methods to perform queries currently have to be added to models individually. *Some basic methods will be added to the base Model class soon.*
 
-### Usage
+### Initialising the Model
 
 ```
 import ProductsModel from 'lib/database/models/Products';
@@ -78,7 +78,92 @@ import database from 'lib/database/Database';
 ...
 const db = await database.getDatabase();
 const model = new ProductsModel(db);
-const products = await model.getAll();
+```
+
+### Fetching Rows
+
+Returns a promise resolving into an array of rows as objects.
+
+```
+get([idOrWhere, options]) // e.g. model.get({ name: 'Foo' }, { limit: 5 })
+
+getColumns(columns[, idOrWhere, options]) // e.g. model.get(['name', 'description'])
+```
+
+### Fetching a Single Row
+
+Applies `limit: 1` to `get()` and returns a promise resolving into the row itself as an object, or `null`.
+
+```
+getOne([idOrWhere, options]) // e.g. model.getOne(42)
+```
+
+### Creating a Row
+
+Returns a promise resolving into the ID of the inserted row.
+
+```
+create(data) // e.g. model.create({ name: 'Foo', description: 'Foo bar.' })
+```
+
+### Deleting a Row
+
+Returns a promise resolving into the ID of the deleted row.
+
+```
+delete([idOrWhere, options]) // e.g. model.delete(42)
+```
+
+### Common Parameters
+
+#### `idOrWhere`
+
+`idOrWhere` is either an integer representing the ID, or an object.
+
+The name of each object property represents the name of the column to perform a where clause on. The value of this property can be an object, or the value in which to perform an _equals_ comparison.
+
+If the value of the property is an object, it can have an `operator` property and a `value` property.
+
+E.g.:
+
+```
+42
+// WHERE id = 42
+
+{
+  name: 'Foo',
+  description: 'Foo bar.',
+}
+// WHERE name = 'Foo' AND description = 'Foo Bar.'
+
+{
+  name: { operator: '!=', value: 'Foo' },
+  description: { operator: 'LIKE', value: '%Bar%' },
+}
+// WHERE name != 'Foo' AND description LIKE '%Bar%'
+```
+
+#### `options`
+
+Options is an object allowing for additional clauses on the query. Available clauses are:
+
+* `limit` : An _integer_ representing the maximum number of rows to return
+* `offset` : An _integer_ respresenting the offset of the returned rows
+* `groupBy` : A _string_ or _array_ of strings representing the columns to group the results by
+* `orderBy`: A _string_ representing the column to order the results by.
+* `order`: A _string_ respresenting the order of the returned results. Either `ASC` or `DESC`. Ingnored if `orderBy` is not set. Defaults to `ASC`
+
+e.g.:
+
+```
+{
+  groupBy: 'name',
+  limit: 20,
+  offset: 5,
+  orderBy: 'created_at',
+  order: 'DESC',
+}
+// GROUP BY name ORDER BY created_at DESC LIMIT 20 OFFSET 5
 ```
 
 ### Removing SQLite
